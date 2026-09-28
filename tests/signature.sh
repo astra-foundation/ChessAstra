@@ -18,7 +18,7 @@ error()
 trap 'error ${LINENO}' ERR
 
 # obtain
-EXE=${EXE:-./stockfish}
+EXE=${EXE:-./chessastra}
 eval "$RUN_PREFIX $EXE bench" > "$STDOUT_FILE" 2> "$STDERR_FILE" || error ${LINENO}
 signature=$(grep "Nodes searched  : " "$STDERR_FILE" | awk '{print $4}')
 

@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Background Gradient -->
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#14192b"/>
+      <stop offset="60%" stop-color="#090d16"/>
+      <stop offset="100%" stop-color="#04060a"/>
+    </radialGradient>
+
+    <!-- Neon Celestial Gradient -->
+    <linearGradient id="neonGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00F2FE"/>
+      <stop offset="50%" stop-color="#4FACFE"/>
+      <stop offset="100%" stop-color="#7F00FF"/>
+    </linearGradient>
+
+    <!-- Gold Starlight Accent Gradient -->
+    <linearGradient id="goldGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF275"/>
+      <stop offset="100%" stop-color="#FF8C00"/>
+    </linearGradient>
+
+    <!-- Glow Filter -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="512" height="512" rx="100" fill="url(#bgGrad)" />
+
+  <!-- Outer Astral Orbit / Hex Shield -->
+  <circle cx="256" cy="256" r="220" fill="none" stroke="#1d2640" stroke-width="2" stroke-dasharray="8 8" opacity="0.6"/>
+  <circle cx="256" cy="256" r="200" fill="none" stroke="url(#neonGlow)" stroke-width="2" opacity="0.4"/>
+
+  <!-- Orbital Constellation Nodes -->
+  <circle cx="256" cy="56" r="5" fill="#00F2FE" filter="url(#glow)"/>
+  <circle cx="456" cy="256" r="5" fill="#4FACFE" filter="url(#glow)"/>
+  <circle cx="256" cy="456" r="5" fill="#7F00FF" filter="url(#glow)"/>
+  <circle cx="56" cy="256" r="5" fill="#00F2FE" filter="url(#glow)"/>
+
+  <!-- Geometric Astral Chess Knight -->
+  <g filter="url(#glow)">
+    <!-- Base Plate -->
+    <path d="M 160 410 L 352 410 L 336 385 L 176 385 Z" fill="url(#neonGlow)" opacity="0.9"/>
+    <path d="M 176 385 L 336 385 L 324 365 L 188 365 Z" fill="#00F2FE" opacity="0.75"/>
+
+    <!-- Knight Neck & Body Geometry -->
+    <path d="M 188 365 
+             L 324 365 
+             L 316 290 
+             L 348 245 
+             L 320 230 
+             L 336 170 
+             L 280 110 
+             L 248 110 
+             L 220 145 
+             L 168 215 
+             L 156 265 
+             L 212 265 
+             L 224 300 
+             L 188 365 Z" 
+          fill="url(#neonGlow)" />
+
+    <!-- Knight Facets & Inner Shading -->
+    <path d="M 280 110 L 256 160 L 220 145 Z" fill="#ffffff" opacity="0.4"/>
+    <path d="M 220 145 L 256 160 L 168 215 Z" fill="#04060a" opacity="0.3"/>
+    <path d="M 168 215 L 256 220 L 156 265 Z" fill="#00F2FE" opacity="0.5"/>
+    <path d="M 156 265 L 256 220 L 212 265 Z" fill="#ffffff" opacity="0.3"/>
+    <path d="M 280 110 L 336 170 L 276 195 L 256 160 Z" fill="#7F00FF" opacity="0.4"/>
+    <path d="M 336 170 L 320 230 L 276 195 Z" fill="#4FACFE" opacity="0.3"/>
+    <path d="M 320 230 L 348 245 L 316 290 L 280 270 L 276 195 Z" fill="#090d16" opacity="0.4"/>
+    <path d="M 212 265 L 256 220 L 280 270 L 224 300 Z" fill="#00F2FE" opacity="0.4"/>
+    <path d="M 224 300 L 280 270 L 316 290 L 324 365 L 188 365 Z" fill="#7F00FF" opacity="0.35"/>
+
+    <!-- Glowing Astral Eye (Diamond Star) -->
+    <path d="M 212 195 L 222 190 L 232 195 L 222 200 Z" fill="url(#goldGlow)" filter="url(#softGlow)"/>
+    <circle cx="222" cy="195" r="2.5" fill="#FFFFFF"/>
+
+    <!-- Mane Constellation Lines & Stars -->
+    <line x1="280" y1="110" x2="336" y2="170" stroke="#FFF275" stroke-width="2.5" opacity="0.85"/>
+    <line x1="336" y1="170" x2="320" y2="230" stroke="#FFF275" stroke-width="2.5" opacity="0.85"/>
+    <line x1="320" y1="230" x2="348" y2="245" stroke="#FFF275" stroke-width="2.5" opacity="0.85"/>
+    <line x1="348" y1="245" x2="316" y2="290" stroke="#FFF275" stroke-width="2.5" opacity="0.85"/>
+
+    <!-- Starlight Vertices -->
+    <circle cx="280" cy="110" r="5" fill="#FFF275" filter="url(#glow)"/>
+    <circle cx="336" cy="170" r="4.5" fill="#FFF275" filter="url(#glow)"/>
+    <circle cx="320" cy="230" r="4.5" fill="#FFF275" filter="url(#glow)"/>
+    <circle cx="348" cy="245" r="4.5" fill="#FFF275" filter="url(#glow)"/>
+    <circle cx="316" cy="290" r="5" fill="#FFF275" filter="url(#glow)"/>
+  </g>
+
+  <!-- 4-Point Starlight Accent in Crown -->
+  <g transform="translate(280, 85) scale(0.6)" filter="url(#glow)">
+    <path d="M 0 -25 Q 0 0 25 0 Q 0 0 0 25 Q 0 0 -25 0 Q 0 0 0 -25 Z" fill="#FFF275"/>
+    <circle cx="0" cy="0" r="4" fill="#FFFFFF"/>
+  </g>
+</svg>

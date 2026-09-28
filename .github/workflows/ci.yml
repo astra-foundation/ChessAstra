@@ -1,0 +1,111 @@
+name: ChessAstra CI
+
+on:
+  push:
+    branches: [ main, master, dev ]
+  pull_request:
+    branches: [ main, master ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [
+          x86-64-sse41-popcnt,
+          x86-64-avx2,
+          x86-64-bmi2,
+          x86-64-avx512,
+          x86-64-vnni512,
+          x86-64-avxvnni
+        ]
+        comp: [gcc, clang]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y make g++ clang llvm
+
+      - name: Download default network
+        run: |
+          cd src
+          make net
+
+      - name: Compile ChessAstra (${{ matrix.arch }} - ${{ matrix.comp }})
+        run: |
+          cd src
+          make -j$(nproc) ARCH=${{ matrix.arch }} COMP=${{ matrix.comp }} build
+
+      - name: Run benchmark verification
+        if: matrix.arch == 'x86-64-sse41-popcnt' || matrix.arch == 'x86-64-avx2'
+        run: |
+          ./src/chessastra bench
+
+  build-windows:
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [
+          x86-64-sse41-popcnt,
+          x86-64-avx2,
+          x86-64-avx512
+        ]
+        comp: [mingw, msvc]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup MSVC
+        if: matrix.comp == 'msvc'
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Setup MinGW
+        if: matrix.comp == 'mingw'
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: mingw-w64-x86_64-gcc make
+
+      - name: Build MinGW
+        if: matrix.comp == 'mingw'
+        shell: msys2 {0}
+        run: |
+          cd src
+          make net
+          make -j ARCH=${{ matrix.arch }} COMP=gcc build
+          ./chessastra.exe bench
+
+      - name: Build MSVC
+        if: matrix.comp == 'msvc'
+        shell: cmd
+        run: |
+          cd src
+          make net
+          nmake /f Makefile.msvc ARCH=${{ matrix.arch }}
+          .\chessastra.exe bench
+
+  build-macos:
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [apple-silicon, armv8-dotprod]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Compile and test on Apple Silicon / ARM
+        run: |
+          cd src
+          make net
+          make -j$(sysctl -n hw.ncpu) ARCH=${{ matrix.arch }} COMP=clang build
+          ./chessastra bench

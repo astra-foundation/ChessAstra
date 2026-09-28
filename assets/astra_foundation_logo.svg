@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="orgBg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#121829"/>
+      <stop offset="100%" stop-color="#05070d"/>
+    </radialGradient>
+
+    <linearGradient id="orgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00F2FE"/>
+      <stop offset="50%" stop-color="#4FACFE"/>
+      <stop offset="100%" stop-color="#7F00FF"/>
+    </linearGradient>
+
+    <linearGradient id="goldStar" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF385"/>
+      <stop offset="100%" stop-color="#FFAE34"/>
+    </linearGradient>
+
+    <filter id="orgGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="512" height="512" rx="128" fill="url(#orgBg)"/>
+
+  <!-- Orbital Ring -->
+  <ellipse cx="256" cy="256" rx="200" ry="90" fill="none" stroke="url(#orgGrad)" stroke-width="3" transform="rotate(-30 256 256)" opacity="0.6" stroke-dasharray="6 6"/>
+  <circle cx="95" cy="165" r="5" fill="#00F2FE" filter="url(#orgGlow)"/>
+  <circle cx="417" cy="347" r="5" fill="#7F00FF" filter="url(#orgGlow)"/>
+
+  <!-- Astra "A" Monogram / Starship Delta -->
+  <g filter="url(#orgGlow)">
+    <!-- Main Legs -->
+    <path d="M 256 90 L 370 390 L 310 390 L 256 240 L 202 390 L 142 390 Z" fill="url(#orgGrad)"/>
+
+    <!-- Crossbar -->
+    <path d="M 195 285 L 317 285 L 305 320 L 207 320 Z" fill="#00F2FE" opacity="0.85"/>
+
+    <!-- Inner Core Apex -->
+    <polygon points="256,155 285,240 227,240" fill="#05070d" opacity="0.75"/>
+  </g>
+
+  <!-- Polaris Star at Apex -->
+  <g transform="translate(256, 90) scale(0.8)" filter="url(#orgGlow)">
+    <path d="M 0 -35 Q 0 0 35 0 Q 0 0 0 35 Q 0 0 -35 0 Q 0 0 0 -35 Z" fill="url(#goldStar)"/>
+    <circle cx="0" cy="0" r="6" fill="#FFFFFF"/>
+  </g>
+</svg>

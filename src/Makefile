@@ -61,11 +61,11 @@ endif
 
 ### Executable name
 ifeq ($(target_windows),yes)
-	EXE = stockfish.exe
+	EXE = chessastra.exe
 else ifneq (,$(findstring wasm,$(ARCH)))
-	EXE = stockfish.js
+	EXE = chessastra.js
 else
-	EXE = stockfish
+	EXE = chessastra
 endif
 
 ### Installation dir definitions
@@ -1355,9 +1355,9 @@ icx-profile-make:
 	all
 
 icx-profile-use:
-	$(XCRUN) $(LLVM_PROFDATA) merge -output=stockfish.profdata *.profraw
+	$(XCRUN) $(LLVM_PROFDATA) merge -output=chessastra.profdata *.profraw
 	$(MAKE) ARCH=$(ARCH) COMP=$(COMP) \
-	EXTRACXXFLAGS='-fprofile-instr-use=stockfish.profdata' \
+	EXTRACXXFLAGS='-fprofile-instr-use=chessastra.profdata' \
 	EXTRALDFLAGS='-fprofile-use ' \
 	all
 

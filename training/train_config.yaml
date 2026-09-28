@@ -1,0 +1,30 @@
+# ChessAstra NNUE Training Configuration (SFNNv16 Fine-Tuning)
+model:
+  architecture: "SFNNv16"
+  input_dims: 86896
+  l1: 1024
+  l2: 32
+  l3: 32
+  buckets: 8
+  base_net: "networks/nn-1a298aa575a0.nnue"
+
+training:
+  batch_size: 16384
+  epochs: 30
+  lr: 0.001
+  min_lr: 0.00001
+  weight_decay: 0.000001
+  eval_lambda: 0.80       # 0.80 WDL loss + 0.20 Eval MSE loss
+  scheduler: "cosine"     # "cosine" or "onecycle"
+  grad_clip: 1.0
+  mixed_precision: true   # fp16 on GPU (Kaggle T4 / P100)
+
+data:
+  train_path: "training/data/train.plain"
+  val_path: "training/data/val.plain"
+  num_workers: 4
+  pin_memory: true
+
+export:
+  output_dir: "networks"
+  net_name_prefix: "chessastra_net"

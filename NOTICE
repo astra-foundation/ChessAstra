@@ -1,0 +1,10 @@
+ChessAstra
+Copyright (C) 2026 ChessAstra developers
+
+ChessAstra is a derivative work based on Stockfish and its NNUE networks, licensed under GPLv3.
+
+Stockfish
+Copyright (C) 2004-2026 The Stockfish developers (see AUTHORS file)
+Licensed under GNU General Public License version 3 or later (GPLv3+).
+Original Stockfish repository: https://github.com/official-stockfish/Stockfish
+Forked from Stockfish 19 release (commit edb0d9db6731067ec50ce619ff372b463bc4dd5d).
