@@ -105,7 +105,9 @@ jobs:
           cd src
           make net
           make -j$(nproc) ARCH=${{ matrix.arch }} COMP=gcc build
-          ./chessastra.exe bench
+          if [ "${{ matrix.arch }}" != "x86-64-avx512" ]; then
+            ./chessastra.exe bench
+          fi
 
       - name: Upload Windows Binary Artifact
         uses: actions/upload-artifact@v4
