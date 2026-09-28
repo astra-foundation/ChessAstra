@@ -238,8 +238,12 @@ void Search::Worker::start_searching() {
                                               - limits.inc[rootPos.side_to_move()]);
 
     Worker* bestThread = this;
-    Skill   skill =
-      Skill(options["Skill Level"], options["UCI_LimitStrength"] ? int(options["UCI_Elo"]) : 0);
+    std::string personality = std::string(options["Personality"]);
+    int effectiveSkill = int(options["Skill Level"]);
+    if (personality == "Beginner" && effectiveSkill == 20 && !options["UCI_LimitStrength"])
+        effectiveSkill = 4;
+
+    Skill skill = Skill(effectiveSkill, options["UCI_LimitStrength"] ? int(options["UCI_Elo"]) : 0);
 
     if (!limits.depth && !skill.enabled())
         bestThread = threads.get_best_thread()->worker.get();
@@ -311,7 +315,12 @@ bool Search::Worker::iterative_deepening() {
     }
 
     usize multiPV = usize(options["MultiPV"]);
-    Skill skill(options["Skill Level"], options["UCI_LimitStrength"] ? int(options["UCI_Elo"]) : 0);
+    std::string personality = std::string(options["Personality"]);
+    int effectiveSkill = int(options["Skill Level"]);
+    if (personality == "Beginner" && effectiveSkill == 20 && !options["UCI_LimitStrength"])
+        effectiveSkill = 4;
+
+    Skill skill(effectiveSkill, options["UCI_LimitStrength"] ? int(options["UCI_Elo"]) : 0);
 
     // When playing with strength handicap enable MultiPV search that we will
     // use behind-the-scenes to retrieve a set of possible moves.
@@ -378,8 +387,21 @@ bool Search::Worker::iterative_deepening() {
             alpha     = std::max(avg - delta, -VALUE_INFINITE);
             beta      = std::min(avg + delta, VALUE_INFINITE);
 
-            // Adjust optimism based on root move's averageScore
-            optimism[us]  = 114 * avg / (std::abs(avg) + 85);
+            // Adjust optimism based on root move's averageScore and Komodo-style Personality/Contempt settings
+            int contemptVal = int(options["Contempt"]);
+            int aggressiveness = int(options["Aggressiveness"]);
+            if (personality == "Aggressive" || personality == "Attacking")
+            {
+                contemptVal += 25;
+                aggressiveness = std::max(aggressiveness, 135);
+            }
+            else if (personality == "Beginner")
+            {
+                contemptVal = 0;
+            }
+
+            Value baseOpt = 114 * avg / (std::abs(avg) + 85);
+            optimism[us]  = (baseOpt + Value(contemptVal * 16)) * aggressiveness / 100;
             optimism[~us] = -optimism[us];
 
             // Start with a small aspiration window and, in the case of a fail
