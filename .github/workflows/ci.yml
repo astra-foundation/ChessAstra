@@ -1,10 +1,11 @@
-name: ChessAstra CI
+name: ChessAstra Multi-Platform CI & Game Testing
 
 on:
   push:
     branches: [ main, master, dev ]
   pull_request:
     branches: [ main, master ]
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -12,6 +13,7 @@ concurrency:
 
 jobs:
   build-linux:
+    name: Linux (${{ matrix.arch }} - ${{ matrix.comp }})
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -32,24 +34,51 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y make g++ clang llvm
+          sudo apt-get install -y make g++ clang llvm python3-pip
 
-      - name: Download default network
+      - name: Download NNUE network
         run: |
           cd src
           make net
 
-      - name: Compile ChessAstra (${{ matrix.arch }} - ${{ matrix.comp }})
+      - name: Compile ChessAstra (${{ matrix.arch }})
         run: |
           cd src
           make -j$(nproc) ARCH=${{ matrix.arch }} COMP=${{ matrix.comp }} build
 
-      - name: Run benchmark verification
+      - name: Run Benchmark Verification
         if: matrix.arch == 'x86-64-sse41-popcnt' || matrix.arch == 'x86-64-avx2'
         run: |
           ./src/chessastra bench
 
+      - name: Run UCI Self-Test Games
+        if: matrix.arch == 'x86-64-avx2' && matrix.comp == 'gcc'
+        run: |
+          python3 -c "
+          import subprocess
+          p = subprocess.Popen(['./src/chessastra'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
+          commands = '''
+          uci
+          isready
+          ucinewgame
+          position startpos moves e2e4 e7e5 g1f3 b8c6
+          go depth 12
+          quit
+          '''
+          out, _ = p.communicate(commands)
+          print(out)
+          assert 'bestmove' in out
+          "
+
+      - name: Upload Binary Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: chessastra-linux-${{ matrix.arch }}-${{ matrix.comp }}
+          path: src/chessastra
+          retention-days: 7
+
   build-windows:
+    name: Windows (${{ matrix.arch }})
     runs-on: windows-2022
     strategy:
       fail-fast: false
@@ -57,43 +86,36 @@ jobs:
         arch: [
           x86-64-sse41-popcnt,
           x86-64-avx2,
+          x86-64-bmi2,
           x86-64-avx512
         ]
-        comp: [mingw, msvc]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup MSVC
-        if: matrix.comp == 'msvc'
-        uses: ilammy/msvc-dev-cmd@v1
-
-      - name: Setup MinGW
-        if: matrix.comp == 'mingw'
+      - name: Setup MinGW via MSYS2
         uses: msys2/setup-msys2@v2
         with:
           update: true
-          install: mingw-w64-x86_64-gcc make
+          install: mingw-w64-x86_64-gcc make curl
 
-      - name: Build MinGW
-        if: matrix.comp == 'mingw'
+      - name: Download NNUE & Build (${{ matrix.arch }})
         shell: msys2 {0}
         run: |
           cd src
           make net
-          make -j ARCH=${{ matrix.arch }} COMP=gcc build
+          make -j$(nproc) ARCH=${{ matrix.arch }} COMP=gcc build
           ./chessastra.exe bench
 
-      - name: Build MSVC
-        if: matrix.comp == 'msvc'
-        shell: cmd
-        run: |
-          cd src
-          make net
-          nmake /f Makefile.msvc ARCH=${{ matrix.arch }}
-          .\chessastra.exe bench
+      - name: Upload Windows Binary Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: chessastra-windows-${{ matrix.arch }}
+          path: src/chessastra.exe
+          retention-days: 7
 
   build-macos:
+    name: macOS Apple Silicon (${{ matrix.arch }})
     runs-on: macos-latest
     strategy:
       fail-fast: false
@@ -103,9 +125,34 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Compile and test on Apple Silicon / ARM
+      - name: Download NNUE & Compile (${{ matrix.arch }})
         run: |
           cd src
           make net
           make -j$(sysctl -n hw.ncpu) ARCH=${{ matrix.arch }} COMP=clang build
           ./chessastra bench
+
+      - name: Run UCI Engine Game Verification
+        run: |
+          python3 -c "
+          import subprocess
+          p = subprocess.Popen(['./src/chessastra'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
+          commands = '''
+          uci
+          isready
+          ucinewgame
+          position startpos moves e2e4 c7c5 g1f3 d7d6
+          go depth 12
+          quit
+          '''
+          out, _ = p.communicate(commands)
+          print(out)
+          assert 'bestmove' in out
+          "
+
+      - name: Upload macOS Binary Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: chessastra-macos-${{ matrix.arch }}
+          path: src/chessastra
+          retention-days: 7

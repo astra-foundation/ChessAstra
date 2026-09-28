@@ -1,0 +1,99 @@
+name: Build & Publish Release Binaries
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release Tag (e.g. v1.0.1)'
+        required: true
+        default: 'v1.0.1'
+
+jobs:
+  release-linux:
+    name: Build Linux Universal & AVX2 Binaries
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: |
+          cd src
+          make net
+          make -j$(nproc) ARCH=x86-64-avx2 COMP=gcc build
+          mkdir -p ../dist
+          cp chessastra ../dist/chessastra-linux-x86-64-avx2
+      - name: Upload Linux Dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-linux
+          path: dist/
+
+  release-windows:
+    name: Build Windows x86-64 Binary
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: mingw-w64-x86_64-gcc make curl
+      - name: Build Windows
+        shell: msys2 {0}
+        run: |
+          cd src
+          make net
+          make -j$(nproc) ARCH=x86-64-avx2 COMP=gcc build
+          mkdir -p ../dist
+          cp chessastra.exe ../dist/chessastra-windows-x86-64-avx2.exe
+      - name: Upload Windows Dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-windows
+          path: dist/
+
+  release-macos:
+    name: Build macOS Apple Silicon Binary
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build macOS
+        run: |
+          cd src
+          make net
+          make -j$(sysctl -n hw.ncpu) ARCH=apple-silicon COMP=clang build
+          mkdir -p ../dist
+          cp chessastra ../dist/chessastra-macos-apple-silicon
+      - name: Upload macOS Dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-macos
+          path: dist/
+
+  publish:
+    name: Package & Publish GitHub Release
+    needs: [release-linux, release-windows, release-macos]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+      - name: Bundle & Checksum
+        run: |
+          mkdir -p final_dist
+          find artifacts/ -type f -exec cp {} final_dist/ \;
+          cp networks/*.nnue final_dist/ 2>/dev/null || true
+          cd final_dist
+          sha256sum * > SHA256SUMS.txt || true
+      - name: Publish Release Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: final_dist/*
+          tag_name: ${{ github.ref_name || inputs.tag }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
