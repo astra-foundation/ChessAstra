@@ -12,6 +12,7 @@ This table tracks every neural network iteration for ChessAstra, including archi
 | **v1** | `chessastra-v1.nnue` | SFNNv16 (L1=1024) | Filtered Self-Play V1 (3.8k pos) | `-34.8 +/- 43.7` | Pending | Completed | Initial test run |
 | **v2** | `chessastra-v2.nnue` | SFNNv16 (L1=1024) | Filtered Self-Play V2 (5.3k pos) | `-23.2 +/- 72.2` | Pending | Completed | Improved draw ratio & tactical stability |
 | **v3** | `chessastra-v3.nnue` | SFNNv16 (L1=1024) | Filtered Master V3 (10.2k pos) | `+52.5 +/- 56.1` | Pending | **Promising** | **LOS 96.99%**, W:12 L:6 D:22 (57.5%), PairsRatio: 3.50 |
+| **PGO-SMP** | `ChessAstra-SMP` | SFNNv16 (PGO + 4T) | Dual Suite (SF + Lichess UHO) | `+70.4 to +168.4` | `+100+` | **Dominant** | **LOS 100%**, W:15 L:2 D:23 (66.3%), PairsRatio: 7.00 |
 
 ---
 
