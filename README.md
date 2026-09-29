@@ -20,12 +20,14 @@ ChessAstra is a high-performance open-source UCI chess engine derivative of Stoc
 
 ---
 
-## Key Features & Goals
+## Key Features & Unique Capabilities
 
-- **State-of-the-Art Architecture:** SFNNv16 NNUE architecture (HalfKAv2_hm + FullThreats + PP_3Wide, L1=1024, L2=32, L3=32, 8 layer stacks).
-- **Data-Driven NNUE Evolution:** Iterative fine-tuning using `nnue-pytorch` on high-quality filtered self-play, diverse tactical positions, and endgame data.
-- **Rigorous Verification:** Strict SPRT testing (Sequential Probability Ratio Test, $H_0: \text{Elo}=0, H_1: \text{Elo}=+3$) with pentanomial model analysis across standard STC (10s + 0.1s) and LTC (60s + 0.6s) with balanced 8-move UHO opening books.
-- **Cross-Platform & SIMD Optimized:** Full support for `x86-64-avx512`, `x86-64-vnni512`, `x86-64-avx2`, `x86-64-bmi2`, `x86-64-modern` (SSE4.1/POPCNT), and `armv8-neon` / Apple Silicon.
+- **Komodo-Style Adaptive Personalities:** Configurable playing styles directly through UCI options (`Default`, `Aggressive`, `Attacking`, `Positional`, `Dynamic`, and `Beginner` handicap modes).
+- **Asymmetric Contempt & Dynamic Aggression:** Adjustable `Contempt` (-100 to +100 cp) and `Aggressiveness` (0–300%) sliders to avoid draw-heavy lines and force sharp, uncompromising attacking play.
+- **State-of-the-Art NNUE Architecture:** SFNNv16 neural evaluation (`HalfKAv2_hm` + `FullThreats` + `PP_3Wide`, `L1=1024`, `L2=32`, `L3=32`, 8 layer stacks) with weights baked directly into the binary via `INCBIN`.
+- **Reproducible Data & Training Infrastructure:** Turnkey self-play generation (`generate_data.py`), dataset filtering/deduplication (`data_filter.py`), and Kaggle GPU remote fine-tuning automation (`run_kaggle.py`).
+- **Comprehensive Testing Harness:** Integrated `fastchess` 60,000-game gauntlet runner, automated SPRT framework with pentanomial model statistics, and dual opening book suites (Lichess UHO + Stockfish UHO).
+- **Cross-Platform & Universal SIMD Targets:** CI builds supporting Linux, Windows, and macOS (Apple Silicon / AVX-512 / VNNI / AVX2 / SSE4.1-POPCNT).
 
 ---
 
